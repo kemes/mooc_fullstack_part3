@@ -40,24 +40,23 @@ app.get('/api/persons/:id', (req,res) => {
 })
 
 app.post('/api/persons/', (req, res) => {
-	const newid = Math.floor(Math.random() * 1000000)
-	if (!req.body.name || !req.body.number) {
-		res.send({error: 'Name and number must be defined.'})
-		res.end()
-	}
-	if(contacts.find(x => x.name === req.body.name) || req.body.name.length == 0 || req.body.number.length == 0) {
-		res.send({error: 'Name and number must be unique and the length can not be 0.'})
-	} else {
-		const newContact = {
-			"id": String(newid + 1),
+	Contact.find({}).then((currentContacts) => {
+		if (!req.body.name || !req.body.number) {
+			return res.status(404).json({error: 'Name and number must be defined.'})
+		}
+
+		if(currentContacts.find(x => x.name === req.body.name) || req.body.name.length === 0 || req.body.number.length === 0) {
+			return res.status(404).json({error: 'Name and number must be unique and the length can not be 0.'})
+		}
+		var newContact = new Contact({
 			"name": req.body.name,
 			"number": req.body.number
-		}
-		contacts = contacts.concat(newContact)
-		console.log(contacts)
-		res.send()
-	}
-
+		})
+		newContact.save().then(res => {
+			console.log(`Added ${req.body.name} ${req.body.number} into DB.`)
+		})
+		res.status(200).json(req.body)
+	})
 })
 
 app.delete('/api/persons/:id', (req, res) => {
