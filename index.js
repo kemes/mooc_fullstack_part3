@@ -60,10 +60,13 @@ app.post('/api/persons/', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-	const id = req.params.id
-
-	contacts = contacts.filter(x => x.id !== id)
-
+	Contact.findByIdAndDelete(req.params.id)
+		.then(result => {
+			res.status(204).end()
+		})
+		.catch(error => {
+			console.log(error.message)
+		})
 })
 
 const PORT = process.env.PORT || 3001
