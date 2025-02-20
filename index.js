@@ -67,6 +67,21 @@ app.delete('/api/persons/:id', (req, res, next) => {
 		.catch(error => next(error))
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+	const body = req.body
+
+	const contact = {
+		name: body.name,
+		number: body.number
+	}
+
+	Contact.findByIdAndUpdate(req.params.id, contact, { new: true })
+		.then(updatedNote => {
+			res.json(updatedNote)
+		})
+		.catch(error => next(error))
+})
+
 const errorHandler = (error, req, res, next) => {
 	console.log(error.message)
 	if (error.message === 'CastError') {
