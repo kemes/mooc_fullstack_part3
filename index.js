@@ -20,23 +20,21 @@ app.get('/api/persons/', (req, res) => {
 
 app.get('/info/',(req,res) => {
 	const currentTime = new Date()
-	const responseText = `<p>${Object.keys(contacts).length} contacts in phonebook</p><br /><p>${currentTime}</p>`
+	Contact.find({})
+		.then(allContacts => {
+			const responseText = `${allContacts.length} contacts in phonebook ${currentTime}`
+			res.json(responseText)
+		})
 
-	res.send(responseText)
 })
 
-app.get('/api/persons/:id', (req,res) => {
+app.get('/api/persons/:id', (req, res, next) => {
 	const id = req.params.id
-	const note = contacts.find(x => x.id === id)
-
-	if (!note) {
-		return res.status(400).json({
-			error:'Wrong ID'
+	Contact.findById({_id: id})
+		.then(fetchedContact => {
+			res.json(fetchedContact)
 		})
-	} else {
-		res.send(note)
-	}
-
+		.catch(error => next(error))
 })
 
 app.post('/api/persons/', (req, res) => {
