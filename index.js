@@ -37,24 +37,27 @@ app.get('/api/persons/:id', (req, res, next) => {
 		.catch(error => next(error))
 })
 
-app.post('/api/persons/', (req, res) => {
-	Contact.find({}).then((currentContacts) => {
-		if (!req.body.name || !req.body.number) {
-			return res.status(404).json({error: 'Name and number must be defined.'})
-		}
+app.post('/api/persons/', (req, res, next) => {
+	Contact.find({})
+		.then((currentContacts) => {
+			if (!req.body.number) {
+				return res.status(404).json({error: 'Name and number must be defined.'})
+			}
 
-		if(currentContacts.find(x => x.name === req.body.name) || req.body.name.length === 0 || req.body.number.length === 0) {
-			return res.status(404).json({error: 'Name and number must be unique and the length can not be 0.'})
-		}
-		var newContact = new Contact({
-			"name": req.body.name,
-			"number": req.body.number
+			if(currentContacts.find(x => x.name === req.body.name) || req.body.name.length === 0 || req.body.number.length === 0) {
+				return res.status(404).json({error: 'Name and number must be unique and the length can not be 0.'})
+			}
+			var newContact = new Contact({
+				"name": req.body.name,
+				"number": req.body.number
+			})
+			newContact.save()
+				.then(savedContact => {
+					console.log(`Added ${req.body.name} ${req.body.number} into DB.`)
+					res.status(200).json(req.body)
+				})
+				.catch(error => next(error))
 		})
-		newContact.save().then(res => {
-			console.log(`Added ${req.body.name} ${req.body.number} into DB.`)
-		})
-		res.status(200).json(req.body)
-	})
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
@@ -81,9 +84,10 @@ app.put('/api/persons/:id', (req, res, next) => {
 })
 
 const errorHandler = (error, req, res, next) => {
-	console.log(error.message)
-	if (error.message === 'CastError') {
+	if (error.name === 'CastError') {
 		return res.status(400).send({ error: 'malformatted id' })
+	} else if (error.name === 'ValidationError') {
+		return res.status(400).json({ error: error.message })
 	}
 
 	next(error)
