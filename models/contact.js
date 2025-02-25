@@ -19,7 +19,14 @@ const contactSchema = new mongoose.Schema({
 		minLength: 3,
 		required: true
 	},
-	number: String
+	number: {
+		type: String,
+		validate: {
+			validator: function(v) {
+				return /^\d{2,3}-\d+$/.test(v)
+			}
+		}
+	}
 })
 
 contactSchema.set('toJSON', {
