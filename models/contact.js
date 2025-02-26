@@ -6,7 +6,7 @@ const url = process.env.MONGO_URL
 mongoose.set('strictQuery',false)
 
 mongoose.connect(url)
-	.then(res => {
+	.then(() => {
 		console.log('Connected to DB.')
 	})
 	.catch(error => {
@@ -14,7 +14,7 @@ mongoose.connect(url)
 	})
 
 const contactSchema = new mongoose.Schema({
-	name: { 
+	name: {
 		type: String,
 		minLength: 3,
 		required: true

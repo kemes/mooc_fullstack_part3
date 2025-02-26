@@ -20,7 +20,7 @@ const contactSchema = new mongoose.Schema({
 
 const Contact = mongoose.model('Contact', contactSchema)
 
-if (process.argv.length==3) {
+if (process.argv.length===3) {
 	console.log('::Phonebook::')
 	Contact.find({}).then(result => {
 		result.forEach(contact => {
@@ -37,7 +37,7 @@ if (process.argv.length==3) {
 		number: number,
 	})
 
-	contact.save().then(result => {
+	contact.save().then(() => {
 		console.log(`Added ${name} ${number} to phonebook`)
 		mongoose.connection.close()
 	})
